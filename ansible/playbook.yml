@@ -1,6 +1,11 @@
-- hosts: webservers
+# - hosts: webservers
+#   become: true
+#   connection: local
+#   roles:
+#     - common
+#     - nginx
+
+- hosts: localhost
   become: true
-  connection: local
   roles:
-    - common
-    - nginx
+    - docker

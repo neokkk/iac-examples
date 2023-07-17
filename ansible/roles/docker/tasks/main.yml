@@ -1,0 +1,42 @@
+- name: Pull docker image
+  community.docker.docker_image:
+    name: registry
+    source: pull
+
+- name: Create directory for registry
+  file:
+    path: /etc/docker/registry
+    state: directory
+
+- name: Copy registry configuration
+  template:
+    src: ../files/config.yml
+    dest: /etc/docker/registry/config.yml
+
+- name: Create registry container
+  community.docker.docker_container:
+    name: registry
+    image: registry
+    detach: true
+    recreate: true
+    restart_policy: unless-stopped
+    mounts:
+      - type: bind
+        source: /etc/docker/registry
+        target: /etc/registry
+    ports:
+      - 5000:5000
+    state: started
+
+- name: Update daemon.json
+  copy:
+    dest: /etc/docker/daemon.json
+    content: |
+      {
+        "registry-mirrors": ["localhost:5000"]
+      }
+
+- name: Restart docker daemon
+  systemd:
+    name: docker
+    state: restarted
