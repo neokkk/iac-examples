@@ -1,0 +1,8 @@
+- name: Install nginx
+  apt: name=nginx state=present
+
+- name: Replace index.html
+  template: src=index.html.j2 dest=/var/www/html/index.html
+
+- name: Start nginx
+  service: name=nginx state=started enabled=yes 

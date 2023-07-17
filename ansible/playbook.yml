@@ -1,0 +1,6 @@
+- hosts: webservers
+  become: true
+  connection: local
+  roles:
+    - common
+    - nginx
