@@ -17,7 +17,7 @@ Vagrant.configure("2") do |config|
   # Every Vagrant development environment requires a box. You can search for
   # boxes at https://vagrantcloud.com/search.
   config.vm.box = "ubuntu/focal64"
-  config.vm.hostname = "ansible-local-1"
+  # config.vm.hostname = "ansible-local-1"
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -37,7 +37,7 @@ Vagrant.configure("2") do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  config.vm.network "private_network", ip: "192.168.33.10"
+  # config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -48,7 +48,7 @@ Vagrant.configure("2") do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: ".git/"
+  config.vm.synced_folder ".", "/vagrant", type: "rsync", rsync__exclude: [".git/"]
 
   # Disable the default share of the current code directory. Doing this
   # provides improved isolation between the vagrant box and your host
@@ -79,14 +79,24 @@ Vagrant.configure("2") do |config|
     export DEBIAN_FRONTEND=noninteractive
     sudo apt -y update
     sudo apt install -y ca-certificates apt-transport-https
-    sudo apt install -y software-properties-common curl wget
+    sudo apt install -y software-properties-common libnss-mdns curl wget
     sudo apt install -y python3-pip python-is-python3
     sudo add-apt-repository --yes --update ppa:ansible/ansible
     sudo apt install -y ansible
     sudo pip3 install docker
     sudo ansible-galaxy collection install community.docker
-    echo "localhost" >> sudo tee /etc/ansible/hosts
+    echo "localhost" | sudo tee /etc/ansible/hosts
     su -c "sudo /vagrant/get-docker.sh" vagrant
     sudo reboot
   SHELL
+
+  config.vm.define "node-01", primary: true do |node|
+    node.vm.hostname = "node-01.local"
+    node.vm.network "private_network", ip: "192.168.33.101"
+  end
+
+  config.vm.define "node-02" do |node|
+    node.vm.hostname = "node-02.local"
+    node.vm.network "private_network", ip: "192.168.33.102"
+  end
 end
