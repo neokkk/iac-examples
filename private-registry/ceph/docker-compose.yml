@@ -1,0 +1,52 @@
+version: "3"
+services:
+  mon:
+    image: ceph/daemon
+    container_name: ceph-mon
+    environment:
+      - MON_IP=192.168.34.101
+      - NEW_USER_KEYRING=4
+      - CEPH_PUBLIC_NETWORK=192.168.34.0/24
+    command: mon && ceph auth get client.bootstrap-osd -o /var/lib/ceph/bootstrap-osd/ceph.keyring
+    volumes:
+      - /etc/ceph:/etc/ceph
+      - /var/lib/ceph/:/var/lib/ceph/
+    network_mode: host
+  mgr:
+    image: ceph/daemon
+    container_name: ceph-mgr
+    restart: always
+    command: mgr
+    volumes:
+      - /etc/ceph:/etc/ceph
+      - /var/lib/ceph/:/var/lib/ceph/
+    network_mode: host
+  osd:
+    image: ceph/daemon
+    container_name: ceph-osd
+    privileged: true
+    pid: host
+    restart: always
+    environment:
+      - OSD_DEVICE=/dev/sdc
+      - OSD_TYPE=disk
+    command: osd
+    depends_on:
+      - mon
+    volumes:
+      - /etc/ceph:/etc/ceph
+      - /var/lib/ceph/:/var/lib/ceph/
+      - /dev/:/dev/
+      - /run/udev/:/run/udev/
+    network_mode: host
+  mds:
+    image: ceph/daemon
+    container_name: ceph-mds
+    restart: always
+    environment:
+      - CEPHFS_CREATE=1
+    command: mds
+    volumes:
+      - /etc/ceph:/etc/ceph
+      - /var/lib/ceph/:/var/lib/ceph/
+    network_mode: host
