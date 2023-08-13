@@ -36,6 +36,6 @@ resource "aws_route_table_association" "nn-vpc-01-rta-private-01" {
 }
 
 resource "aws_route_table_association" "nn-vpc-01-rta-private-02" {
-  subnet_id      = aws_subnet.nn-vpc-01-subnet-private-01.id
+  subnet_id      = aws_subnet.nn-vpc-01-subnet-private-02.id
   route_table_id = aws_route_table.nn-vpc-01-rt-private.id
 }
