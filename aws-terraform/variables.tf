@@ -1,7 +1,3 @@
-variable "key_name" {
-  default = "nn"
-}
-
 variable "region" {
   default = "ap-northeast-2"
 }

@@ -30,6 +30,12 @@ resource "aws_route_table" "nn-vpc-01-rt-private" {
   }
 }
 
+resource "aws_route" "nn-vpc-01-rt-private-ngw" {
+  route_table_id         = aws_route_table.nn-vpc-01-rt-private.id
+  gateway_id             = aws_nat_gateway.nn-vpc-01-ngw.id
+  destination_cidr_block = "0.0.0.0/0"
+}
+
 resource "aws_route_table_association" "nn-vpc-01-rta-private-01" {
   subnet_id      = aws_subnet.nn-vpc-01-subnet-private-01.id
   route_table_id = aws_route_table.nn-vpc-01-rt-private.id

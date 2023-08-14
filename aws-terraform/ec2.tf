@@ -1,4 +1,9 @@
-resource "aws_eip" "nn-eip-public" {
+resource "aws_key_pair" "nn-key" {
+  key_name = "nn"
+  public_key = file("./nn.pub")
+}
+ 
+resource "aws_eip" "nn-ec2-public-01-eip" {
   instance = aws_instance.nn-ec2-public-01.id
   domain   = "vpc"
 }
@@ -6,7 +11,7 @@ resource "aws_eip" "nn-eip-public" {
 resource "aws_instance" "nn-ec2-public-01" {
   ami                         = var.ami
   instance_type               = "t3.medium"
-  key_name                    = var.key_name
+  key_name                    = aws_key_pair.nn-key.key_name
   user_data                   = file("./init.sh")
   subnet_id                   = aws_subnet.nn-vpc-01-subnet-public-01.id
   security_groups             = [aws_security_group.nn-sg-public.id]
@@ -36,7 +41,7 @@ resource "aws_instance" "nn-ec2-public-01" {
 module "nn_private_instance_01" {
   ami             = var.ami
   source          = "./ec2_instance_module"
-  key_name        = var.key_name
+  key_name        = aws_key_pair.nn-key.key_name
   instance_type   = "t3.medium"
   subnet_id       = aws_subnet.nn-vpc-01-subnet-private-01.id
   security_groups = [aws_security_group.nn-sg-private.id]
@@ -49,7 +54,7 @@ module "nn_private_instance_01" {
 module "nn_private_instance_02" {
   ami             = var.ami
   source          = "./ec2_instance_module"
-  key_name        = var.key_name
+  key_name        = aws_key_pair.nn-key.key_name
   instance_type   = "t2.medium"
   subnet_id       = aws_subnet.nn-vpc-01-subnet-private-01.id
   security_groups = [aws_security_group.nn-sg-private.id]
@@ -62,7 +67,7 @@ module "nn_private_instance_02" {
 module "nn_private_instance_03" {
   ami             = var.ami
   source          = "./ec2_instance_module"
-  key_name        = var.key_name
+  key_name        = aws_key_pair.nn-key.key_name
   instance_type   = "t2.medium"
   subnet_id       = aws_subnet.nn-vpc-01-subnet-private-02.id
   security_groups = [aws_security_group.nn-sg-private.id]
